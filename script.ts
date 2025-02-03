@@ -1,31 +1,37 @@
 
-// 1 - Faça um fetch das vendas: https://api.origamid.dev/json/vendas.json
-// 2 - Defina o tipo/interface de cada venda (tuple)
-// 3 - Some o total das vendas e mostre na tela
 
-async function fetchVendas() {
-    const response = await fetch("https://api.origamid.dev/json/vendas.json");
-    const json = await response.json();
-    handleVendas(json);
-}
 
-fetchVendas();
+//⬇️ dessa forma funciona
 
-type VendaTuple = [string, number, string, { marca: string; cor: string}];
+// interface ObjetoLiteral {
+//     [key: string]: unknown;
+// }
 
-function handleVendas(data: Array<VendaTuple>) {
-    let totalVendas = 0;
+// function mostrarTitulo(obj: ObjetoLiteral) {
+//     if ("titulo" in obj) {
+//         console.log(obj.titulo);
+//     }
+// }
 
-    if (data) {
-        data.forEach((venda) => {
-            totalVendas+= venda[1];
-            document.body.innerHTML = `
-            <p>Total de vendas: ${totalVendas}</p>
-            `;
+// ⬇️ dessa forma também
 
-        })
+type ObjetoLiteral2 = Record<"titulo" | "autor", unknown>;
+
+
+function mostrarTitulo(obj: ObjetoLiteral2) {
+    if ("titulo" in obj) {
+        console.log(obj.titulo);
     }
-
-    console.log("Total Vendas: " + totalVendas)
 }
+
+//erros: ⬇️
+mostrarTitulo(200)
+mostrarTitulo("dsadsd")
+mostrarTitulo(null)
+mostrarTitulo(undefined)
+
+mostrarTitulo({
+    titulo: "HTML e CSS",
+    autor: "Daniela Alves"
+})
 

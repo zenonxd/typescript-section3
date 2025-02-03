@@ -214,3 +214,184 @@ function handleVendas(data: Array<VendaTuple>) {
     console.log("Total Vendas: " + totalVendas)
 }
 ```
+
+# Keyof
+
+Indica que um dado (const/let) é uma chave de uma interface ou tipo, veja:
+
+```ts
+interface Produto {
+  nome: string;
+  preco: number;
+}
+
+let chave: keyof Produto;
+// let chave: "nome" | "produto"; mesma coisa que isso acima ⬆️
+
+chave = 'nome';
+chave = 'preco';
+```
+
+Quando falamos que chave é `keyof Produto`, ela pode ser `nome`, `preco` ou outro atributo. Entenda, não tem nada a ver
+com ser string ou number.
+
+Key é o primeiro valor `nome:` ou `preco:`, o que vale é o valor da esquerda (key).
+
+# Typeof
+
+Já sabemos que o `typeof` no JS é responsável por retornar o tipo de dado.
+
+No TS, podemos **utilizar ele para indicar que um dado possui O MESMO TIPO que outro**.
+
+```ts
+function coordenadas(x: number, y: number) {
+  return { x, y };
+}
+
+let coord: typeof coordenadas;
+
+coord = (x: number, y: number) => {
+  return { x, y };
+};
+```
+
+A partir do momento que declaramos que `coord` tem o tipo de coordenadas (uma função), o TS obriga essa variável a ter
+a mesma interface, ou seja: ser uma função, possuir parâmetros e retornar os valores.
+
+# Objetos
+
+Vamos ver agora, como o TS lida com objetos.
+
+## Duck Typing
+
+Um objeto quando é passado em uma função, pode conter propriedades e métodos além dos declarados na interface.
+
+"Se parece com um pato, nada com um pato e grasna como um pato, então provavelmente é um pato."
+
+Note o código abaixo! Nós temos uma interface de Produto com duas propriedades iniciais.
+
+Os dois produtos seguintes, possuem propriedades a mais e, portanto, são válidos como "Produto".
+
+Agora, serviço possui nome, mas não possui a quantidade, logo, não serve.
+
+**Ou seja, você poder ter propriedades a mais, porém não a menos.**
+
+```ts
+interface Produto {
+  nome: string;
+  quantidade: number;
+}
+
+const produto1 = {
+    nome: 'Notebook',
+    quantidade: 10,
+    cor: 'azul',
+};
+
+const produto2 = {
+    nome: 'Geladeira',
+    quantidade: 4,
+    freezer: true,
+};
+
+const servico1 = {
+    nome: 'Instalação',
+};
+
+function mostrarQuantidade(produto: Produto) {
+    console.log(produto.quantidade + 20);
+}
+
+mostrarQuantidade(produto1);
+mostrarQuantidade(produto2);
+
+// erro, não possui quantidade
+mostrarQuantidade(servico1);
+```
+
+## Partial - utility types
+
+O TS conta com `utility types`, tipos que podem ser utilizados como funções para a definição de novos tipos.
+
+Com o `Partial<Tipo>`, podemos indicar que todas as propriedades da interface passada em Tipo, são opcionais.
+
+Então podemos pegar uma interface, por exemplo, passar dentro de `Partial`. Após isso, automaticamente ele cria uma NOVA
+interface onde as propriedades da interface serão opcionais.
+
+```ts
+function mostrarQuantidade(produto: Partial<Produto>) {
+  // erro, quantidade pode ser undefined
+  console.log(produto.quantidade + 20);
+  //para n ser undefined, verificamos se ela existe
+    
+  if (produto.quantidade) {
+      produto.quantidade + 20;
+  }  
+}
+```
+
+Com esse `Partial<Produto>`, os erros que ocorria em [duck typing](#duck-typing), não irão mais ocorrer. Visto que as
+propriedades passam a ser opcionais.
+
+## Definindo um objeto com propriedades além das definidas previamente
+
+Podemos definir que um objeto poderá conter propriedades/métodos além dos que foram definidos inicialmente.
+
+Vejamos o exemplo abaixo. Temos uma interface e depois uma constante "Artigo" que é do tipo Post.
+
+```ts
+interface Post {
+    titulo: string;
+    visualizacoes: number;
+    tags: Array<string>;
+}
+
+const artigo: Post = {
+    titulo: 'Como aprender HTML',
+    visualizacoes: 3000,
+    tags: ['HTML', 'Frontend'],
+}
+```
+
+E se esse artigo tivesse outras propriedades como, por exemplo, um autor? **Nós indicamos na interface, veja:**
+
+```ts
+interface Post {
+    titulo: string;
+    visualizacoes: number;
+    tags: Array<string>;
+
+    [key: string]: unknown;
+}
+
+const artigo: Post = {
+    titulo: 'Como aprender HTML',
+    visualizacoes: 3000,
+    tags: ['HTML', 'Frontend'],
+
+    autor: 'André',
+}
+
+artigo.autor;
+artigo.descricao;
+```
+
+O problema, é que como é um valor "unknown", ele nos deixa criar outras propriedades. Para resolver isso, e poder realizar
+operações, precisamos fazer a verificação de sempre:
+
+![img_7.png](img_7.png)
+
+## Record
+
+O record define a interface de um objeto que possui ``<chave, tipo>``. Ele pode ser usado para definir a interface
+de um objeto literal genérico.
+
+Repare na imagem abaixo, podemos utilizar a primeira abordagem e a segunda.
+
+![img_8.png](img_8.png)
+
+Entretanto, um adendo: o `Record` é flexível, poderíamos dizer que ao invés de string, poderia ser ``titulo | autor``:
+
+![img_9.png](img_9.png)
+
+E ele já iria conseguir identificar!
