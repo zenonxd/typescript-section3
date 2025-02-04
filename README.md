@@ -2,7 +2,7 @@
 
 Parte 3 do curso de Typescript da Origamid, lecionado pelo André Rafael.
 
-Agora, entraremos mais em objetos, interfaces, DOM, generics, funções, etc.
+Agora, entraremos mais em classes, tuples, keyof e objetos.
 
 Caso tenha alguma dúvida, recorra à [Parte 1]() do estudo.
 
